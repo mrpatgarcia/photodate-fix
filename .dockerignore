@@ -1,0 +1,85 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+*.md
+.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+*~
+
+# Application data - exclude from image but keep structure
+data/photos/unprocessed/*
+data/photos/processed/*
+data/db/*.db
+!data/photos/unprocessed/.gitkeep
+!data/photos/processed/.gitkeep
+!data/db/.gitkeep
+
+# Logs and databases
+*.log
+*.db
+*.sqlite3
+
+# Backup files
+*.backup
+*.bak
+
+# Local environment files
+.env
+.env.local
+.env.production
+
+# Windows batch files (for local development)
+*.bat
+
+# Shell scripts (for local development)
+*.sh
+
+# Old structure files (if any remain)
+photos/
+photo_scanner.db
+processed_photos.json

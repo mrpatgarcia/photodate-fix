@@ -1,0 +1,60 @@
+# Data directory contents (but preserve structure)
+data/photos/unprocessed/*
+data/photos/processed/*
+data/thumbs/*
+data/db/*.db
+data/db/*.sqlite*
+data/db/scheduler.log
+
+# Exception: keep .gitkeep files to preserve directory structure
+!data/photos/unprocessed/.gitkeep
+!data/photos/processed/.gitkeep
+!data/thumbs/.gitkeep
+!data/db/.gitkeep
+
+# Legacy photos directories (old structure)
+photos/unprocessed/
+photos/processed/
+
+# Image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Application files
+processed_photos.json
+*.backup
+photo_scanner.db
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Docker Compose
+docker-compose.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

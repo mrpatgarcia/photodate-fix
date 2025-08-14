@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Groups - Photo Date Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Similar Photo Groups</h1>
+            <p>Photos automatically grouped by similarity analysis</p>
+            <nav>
+                <a href="{{ url_for('index') }}" class="nav-link">← Back to Main</a>
+            </nav>
+        </header>
+
+        <main>
+            {% if photo_groups %}
+                <div class="groups-grid">
+                    {% for group in photo_groups %}
+                        <div class="photo-group">
+                            <div class="group-info">
+                                <h3>{{ group.name or 'Unnamed Group' }}</h3>
+                                <p class="group-description">{{ group.description or 'No description' }}</p>
+                                <div class="group-stats">
+                                    <span class="stat">{{ group.photo_count }} photos</span>
+                                    {% if group.similarity_score %}
+                                        <span class="stat">Similarity: {{ "%.1f" | format(group.similarity_score * 100) }}%</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="group-photos">
+                                {% for photo in group.photos[:6] %}
+                                    <div class="group-photo-item">
+                                        <img src="{{ url_for('serve_photo', filename=photo.filepath|photo_filename) }}" 
+                                             alt="{{ photo.base_name }}"
+                                             class="group-photo-image clickable-photo"
+                                             data-full-src="{{ url_for('serve_photo', filename=photo.filepath|photo_filename) }}"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <div class="image-placeholder" style="display: none;">
+                                            <span>Missing</span>
+                                        </div>
+                                        <div class="photo-filename">{{ photo.filepath.split('/')[-1] }}</div>
+                                    </div>
+                                {% endfor %}
+                                
+                                {% if group.photo_count > 6 %}
+                                    <div class="more-photos">
+                                        <span>+{{ group.photo_count - 6 }} more</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="group-actions">
+                                <button class="btn-secondary" onclick="toggleGroupExpansion(this)">
+                                    Show All Photos
+                                </button>
+                                <button class="btn-primary" onclick="batchUpdateGroup({{ group.id }})">
+                                    Batch Update Dates
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-groups">
+                    <h2>No Photo Groups Found</h2>
+                    <p>Run the photo grouping analysis to automatically detect similar photos.</p>
+                    <div class="instructions">
+                        <h3>To create photo groups:</h3>
+                        <ol>
+                            <li>Run the grouping analysis: <code>python run_photo_grouping.py</code></li>
+                            <li>Or schedule it as a cron job for automatic processing</li>
+                            <li>Refresh this page to see the results</li>
+                        </ol>
+                    </div>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="Full size photo">
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        function toggleGroupExpansion(button) {
+            const group = button.closest('.photo-group');
+            const photosContainer = group.querySelector('.group-photos');
+            
+            if (photosContainer.classList.contains('expanded')) {
+                photosContainer.classList.remove('expanded');
+                button.textContent = 'Show All Photos';
+            } else {
+                photosContainer.classList.add('expanded');
+                button.textContent = 'Show Less';
+            }
+        }
+        
+        function batchUpdateGroup(groupId) {
+            const date = prompt('Enter the date for all photos in this group (YYYY-MM-DD):');
+            if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                alert('Batch update functionality will be implemented soon!');
+                // TODO: Implement batch update for photo groups
+            } else if (date) {
+                alert('Please enter a valid date in YYYY-MM-DD format');
+            }
+        }
+    </script>
+</body>
+</html>

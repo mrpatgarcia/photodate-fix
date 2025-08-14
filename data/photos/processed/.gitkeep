@@ -1,0 +1,2 @@
+# This file ensures the processed photos directory is preserved in git
+# Processed photos will be organized here by date (YYYY/MM/)

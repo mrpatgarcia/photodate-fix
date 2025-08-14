@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Date Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Photo Date Scanner</h1>
+            {% if total_pages > 1 %}
+                <div class="pagination-info">
+                    <span>Page {{ current_page }} of {{ total_pages }} ({{ total_items }} total items)</span>
+                </div>
+            {% endif %}
+        </header>
+
+        <main>
+            <!-- Individual Photos Section (shown first) -->
+            {% if photo_pairs %}
+                <section class="individual-photos">
+                    <div class="group-header">
+                        <h2>Individual Photos</h2>
+                    </div>
+                    
+                    <div class="photo-grid">
+                        {% for base_name, pair in photo_pairs.items() %}
+                            <div class="photo-pair" data-base-name="{{ base_name }}">
+                                
+                                <div class="photo-display">
+                                    {% if pair.front %}
+                                        <div class="photo-side">
+                                            <label>Front</label>
+                                            <img src="{{ url_for('serve_thumbnail', filename=pair.front|photo_filename) }}" 
+                                                 alt="Front of {{ base_name }}" 
+                                                 class="photo-image clickable-photo"
+                                                 data-full-src="{{ url_for('serve_photo', filename=pair.front|photo_filename) }}"
+                                                 loading="lazy"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                            <div class="image-placeholder" style="display: none;">
+                                                <span>Image not found</span>
+                                            </div>
+                                            <div class="filename">{{ pair.front.split('/')[-1] }}</div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="photo-side">
+                                        <label>Back</label>
+                                        {% if pair.back %}
+                                            <img src="{{ url_for('serve_thumbnail', filename=pair.back|photo_filename) }}" 
+                                                 alt="Back of {{ base_name }}"
+                                                 class="photo-image clickable-photo"
+                                                 data-full-src="{{ url_for('serve_photo', filename=pair.back|photo_filename) }}"
+                                                 loading="lazy"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                            <div class="image-placeholder" style="display: none;">
+                                                <span>Image not found</span>
+                                            </div>
+                                            <div class="filename">{{ pair.back.split('/')[-1] }}</div>
+                                        {% else %}
+                                            <div class="image-placeholder">
+                                                <span>None available</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Display variant images -->
+                                    {% for variant in pair.variants %}
+                                        <div class="photo-side">
+                                            <label>Original</label>
+                                            <img src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}" 
+                                                 alt="Variant of {{ base_name }}"
+                                                 class="photo-image clickable-photo"
+                                                 data-full-src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}"
+                                                 loading="lazy"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                            <div class="image-placeholder" style="display: none;">
+                                                <span>Image not found</span>
+                                            </div>
+                                            <div class="filename">{{ variant.split('/')[-1] }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="date-input-section">
+                                    <form class="date-form">
+                                        <label for="date-{{ base_name }}">Correct Date:</label>
+                                        <input type="date" 
+                                               id="date-{{ base_name }}" 
+                                               name="date" 
+                                               value="{{ pair.default_date or '' }}"
+                                               required>
+                                        <button type="submit">Update Date</button>
+                                        <button type="button" class="ignore-btn">Unknown</button>
+                                    </form>
+                                    <div class="status-message"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            
+            <!-- Grouped Photos (shown after individual photos) -->
+            {% if similarity_groups %}
+                {% for group in similarity_groups %}
+                    <section class="similarity-group">
+                        <div class="group-header">
+                            <h2>{{ group.group_name or 'Similar Photos Group' }}</h2>
+                            <div class="group-meta">
+                                <span class="group-stats">{{ group.photo_pairs|length }} photo sets</span>
+                                <span class="similarity-score">{{ "%.1f" | format(group.similarity_score * 100) }}% similarity</span>
+                            </div>
+                        </div>
+                        
+                        <div class="photo-grid">
+                            {% for base_name, pair in group.photo_pairs.items() %}
+                                <div class="photo-pair" data-base-name="{{ base_name }}" data-group-id="{{ group.group_id }}">
+                                    
+                                    <div class="photo-display">
+                                        {% if pair.front %}
+                                            <div class="photo-side">
+                                                <label>Front</label>
+                                                <img src="{{ url_for('serve_thumbnail', filename=pair.front|photo_filename) }}" 
+                                                     alt="Front of {{ base_name }}" 
+                                                     class="photo-image clickable-photo"
+                                                     data-full-src="{{ url_for('serve_photo', filename=pair.front|photo_filename) }}"
+                                                     loading="lazy"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div class="image-placeholder" style="display: none;">
+                                                    <span>Image not found</span>
+                                                </div>
+                                                <div class="filename">{{ pair.front.split('/')[-1] }}</div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="photo-side">
+                                            <label>Back</label>
+                                            {% if pair.back %}
+                                                <img src="{{ url_for('serve_thumbnail', filename=pair.back|photo_filename) }}" 
+                                                     alt="Back of {{ base_name }}"
+                                                     class="photo-image clickable-photo"
+                                                     data-full-src="{{ url_for('serve_photo', filename=pair.back|photo_filename) }}"
+                                                     loading="lazy"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div class="image-placeholder" style="display: none;">
+                                                    <span>Image not found</span>
+                                                </div>
+                                                <div class="filename">{{ pair.back.split('/')[-1] }}</div>
+                                            {% else %}
+                                                <div class="image-placeholder">
+                                                    <span>None available</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Display variant images -->
+                                        {% for variant in pair.variants %}
+                                            <div class="photo-side">
+                                                <label>Original</label>
+                                                <img src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}" 
+                                                     alt="Variant of {{ base_name }}"
+                                                     class="photo-image clickable-photo"
+                                                     data-full-src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}"
+                                                     loading="lazy"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div class="image-placeholder" style="display: none;">
+                                                    <span>Image not found</span>
+                                                </div>
+                                                <div class="filename">{{ variant.split('/')[-1] }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="date-input-section">
+                                        <form class="date-form">
+                                            <label for="date-{{ base_name }}">Correct Date:</label>
+                                            <input type="date" 
+                                                   id="date-{{ base_name }}" 
+                                                   name="date" 
+                                                   value="{{ pair.default_date or '' }}"
+                                                   required>
+                                            <button type="submit">Update Date</button>
+                                            <button type="button" class="ignore-btn">Unknown</button>
+                                        </form>
+                                        <div class="status-message"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="batch-date-section">
+                            <form class="batch-date-form">
+                                <label for="batch-date-{{ group.group_id }}">Batch Date for Group:</label>
+                                <input type="date" 
+                                       id="batch-date-{{ group.group_id }}" 
+                                       name="batch-date" 
+                                       value="{{ (group.photo_pairs.values() | list | first).default_date or '' }}"
+                                       required>
+                                <button type="submit" class="batch-date-btn" data-group-id="{{ group.group_id }}">
+                                    Batch Update Dates
+                                </button>
+                            </form>
+                            <div class="batch-status-message"></div>
+                        </div>
+                    </section>
+                {% endfor %}
+            {% endif %}
+            
+            {% if not similarity_groups and not photo_pairs %}
+                <div class="no-photos">
+                    <h2>No unprocessed photos found</h2>
+                    <p>All photos in the photos directory have been processed, or no photos were found.</p>
+                    <p>Add new photos to the <code>./photos</code> directory and refresh the page.</p>
+                </div>
+            {% endif %}
+            
+            <!-- Pagination Controls -->
+            {% if total_pages > 1 %}
+                <div class="pagination">
+                    <div class="pagination-controls">
+                        {% if current_page > 1 %}
+                            <a href="?page=1" class="pagination-btn first">« First</a>
+                            <a href="?page={{ current_page - 1 }}" class="pagination-btn prev">‹ Previous</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">« First</span>
+                            <span class="pagination-btn disabled">‹ Previous</span>
+                        {% endif %}
+                        
+                        <div class="pagination-numbers">
+                            {% set start_page = ([current_page - 2, 1] | max) %}
+                            {% set end_page = ([current_page + 2, total_pages] | min) %}
+                            
+                            {% if start_page > 1 %}
+                                <a href="?page=1" class="pagination-btn">1</a>
+                                {% if start_page > 2 %}
+                                    <span class="pagination-ellipsis">...</span>
+                                {% endif %}
+                            {% endif %}
+                            
+                            {% for page_num in range(start_page, end_page + 1) %}
+                                {% if page_num == current_page %}
+                                    <span class="pagination-btn current">{{ page_num }}</span>
+                                {% else %}
+                                    <a href="?page={{ page_num }}" class="pagination-btn">{{ page_num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if end_page < total_pages %}
+                                {% if end_page < total_pages - 1 %}
+                                    <span class="pagination-ellipsis">...</span>
+                                {% endif %}
+                                <a href="?page={{ total_pages }}" class="pagination-btn">{{ total_pages }}</a>
+                            {% endif %}
+                        </div>
+                        
+                        {% if current_page < total_pages %}
+                            <a href="?page={{ current_page + 1 }}" class="pagination-btn next">Next ›</a>
+                            <a href="?page={{ total_pages }}" class="pagination-btn last">Last »</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">Next ›</span>
+                            <span class="pagination-btn disabled">Last »</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="pagination-summary">
+                        Showing page {{ current_page }} of {{ total_pages }} 
+                        ({{ total_items }} total items)
+                    </div>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalLoading" class="modal-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading full resolution image...</p>
+            </div>
+            <img id="modalImage" src="" alt="Full size photo" style="display: none;">
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
