@@ -209,31 +209,6 @@ photodate-fix/
 └── .env                 # Environment configuration
 ```
 
-#### Legacy Structure (Native Installation)
-```
-photodate-fix/
-├── photos/
-│   ├── unprocessed/         # Your scanned photos awaiting processing (excluded from git)
-│   └── processed/YYYY/MM/   # Processed photos organized by date (excluded from git)
-├── static/
-│   ├── css/style.css       # Application styling
-│   └── js/app.js           # Frontend JavaScript
-├── templates/
-│   └── index.html          # Main web interface
-├── app.py                  # Main Flask application
-├── similarity_analyzer.py  # Photo similarity detection
-├── database.py            # Database operations
-└── requirements.txt       # Python dependencies
-```
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and test thoroughly
-4. Commit your changes: `git commit -m "Add feature"`
-5. Push to your branch: `git push origin feature-name`
-6. Submit a pull request
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -254,19 +229,10 @@ photodate-fix/
 
 **Database issues:**
 - Delete `photo_scanner.db` to reset (will reprocess all photos)
-- Legacy `processed_photos.json` will be used as fallback
-
-### Getting Help
-1. Check the troubleshooting section above
-2. Review log output in the console
-3. Open an issue on GitHub with:
-   - Error messages
-   - Steps to reproduce
-   - Sample photo names (anonymized)
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License
 
 ## 🙏 Acknowledgments
 
