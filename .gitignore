@@ -49,6 +49,9 @@ photo_scanner.db
 # Docker Compose
 docker-compose.yml
 
+# Claude Code
+.claude/
+
 # IDE
 .vscode/
 .idea/
