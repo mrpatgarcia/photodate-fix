@@ -806,7 +806,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGINT, signal_handler)
     
-    print("FastFoto Date Scanner - Initializing...")
+    print("PhotoDate Fix - Initializing...")
     
     try:
         # Create required directories
@@ -833,7 +833,7 @@ if __name__ == '__main__':
         
         scan_interval = int(os.getenv('SCAN_INTERVAL_HOURS', '1'))
         
-        print(f"\nStarting FastFoto Date Scanner...")
+        print(f"\nStarting PhotoDate Fix...")
         print(f"  Host: {host}:{port}")
         print(f"  Debug mode: {debug_mode}")
         print(f"  Photos directory: {UNPROCESSED_DIR}")

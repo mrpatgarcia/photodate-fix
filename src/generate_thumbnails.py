@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate thumbnails for existing photos in the FastFoto Date Scanner
+Generate thumbnails for existing photos in PhotoDate Fix
 Run this script to create thumbnails for photos that were added before thumbnail functionality
 """
 import os

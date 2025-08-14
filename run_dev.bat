@@ -1,5 +1,5 @@
 @echo off
-echo 🔧 FastFoto Date Scanner - Development Runner
+echo 🔧 PhotoDate Fix - Development Runner
 echo.
 
 :: Check if virtual environment exists

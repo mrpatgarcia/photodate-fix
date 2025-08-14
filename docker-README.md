@@ -1,6 +1,6 @@
-# FastFoto Date Scanner - Docker Setup
+# PhotoDate Fix - Docker Setup
 
-This document explains how to run the FastFoto Date Scanner using Docker and Docker Compose.
+This document explains how to run PhotoDate Fix using Docker and Docker Compose.
 
 ## 🐳 Docker Overview
 
@@ -15,7 +15,7 @@ The application is containerized for easy deployment across Windows, Linux, and 
 ## 📁 Project Structure
 
 ```
-fastfoto-date-scanner/
+photodate-fix/
 ├── src/                    # Application source code
 │   ├── app.py             # Main Flask application
 │   ├── database.py        # Database management
@@ -45,7 +45,7 @@ fastfoto-date-scanner/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd fastfoto-date-scanner
+cd photodate-fix
 
 # Copy and customize environment file
 cp .env.example .env

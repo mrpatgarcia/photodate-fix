@@ -1,7 +1,7 @@
 #!/bin/bash
 # Pure Docker development workflow - no local Python dependencies needed
 
-echo "🐳 FastFoto Date Scanner - Docker Development"
+echo "🐳 PhotoDate Fix - Docker Development"
 echo "=============================================="
 
 # Create data directories if they don't exist

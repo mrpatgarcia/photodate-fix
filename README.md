@@ -1,4 +1,4 @@
-# FastFoto Date Scanner
+# PhotoDate Fix
 
 A Flask web application designed specifically for **Epson FastFoto scanner** users to help accurately date their scanned photos. This tool solves the common problem of scanned photos having incorrect dates by providing an intuitive interface to review and correct photo dates, with automatic updates to EXIF data, file timestamps, and metadata.
 
@@ -51,7 +51,7 @@ When using Epson FastFoto scanners, photos often get scanned with incorrect date
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd fastfoto-date-scanner
+cd photodate-fix
 
 # 2. Configure environment (optional)
 cp .env.example .env
@@ -72,8 +72,8 @@ For detailed Docker setup instructions, see [docker-README.md](docker-README.md)
 #### Windows (Recommended)
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/fastfoto-date-scanner.git
-cd fastfoto-date-scanner
+git clone https://github.com/yourusername/photodate-fix.git
+cd photodate-fix
 
 # 2. Run the automated setup
 setup_venv.bat
@@ -93,8 +93,8 @@ python app.py
 #### Linux/macOS
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/fastfoto-date-scanner.git
-cd fastfoto-date-scanner
+git clone https://github.com/yourusername/photodate-fix.git
+cd photodate-fix
 
 # 2. Set up virtual environment
 ./setup_venv.sh
@@ -191,7 +191,7 @@ python reset_similarity_analysis.py
 
 #### Docker Structure (Recommended)
 ```
-fastfoto-date-scanner/
+photodate-fix/
 ├── src/                    # Application source code
 │   ├── app.py             # Main Flask application
 │   ├── database.py        # Database management
@@ -211,7 +211,7 @@ fastfoto-date-scanner/
 
 #### Legacy Structure (Native Installation)
 ```
-fastfoto-date-scanner/
+photodate-fix/
 ├── photos/
 │   ├── unprocessed/         # Your scanned photos awaiting processing (excluded from git)
 │   └── processed/YYYY/MM/   # Processed photos organized by date (excluded from git)

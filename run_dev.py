@@ -62,7 +62,7 @@ def run_app():
         sys.exit(1)
 
 if __name__ == "__main__":
-    print("🔧 Development runner for FastFoto Date Scanner")
+    print("🔧 Development runner for PhotoDate Fix")
     
     if not check_and_install_deps():
         print("❌ Failed to install dependencies. Please run:")

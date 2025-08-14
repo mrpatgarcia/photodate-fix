@@ -22,7 +22,7 @@ Once a photo has been given the correct date, it will not show up in the GUI any
 
 ## Current Repository Structure
 ```
-D:\code\scanner-time\
+D:\code\photodate-fix\
 ├── src/                          # Main application source code
 │   ├── app.py                   # Main Flask application with PhotoManager class
 │   ├── database.py              # SQLite database operations

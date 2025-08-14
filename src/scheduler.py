@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scheduled task manager for FastFoto Date Scanner
+Scheduled task manager for PhotoDate Fix
 Runs photo scanning and similarity analysis on a regular interval
 """
 import os

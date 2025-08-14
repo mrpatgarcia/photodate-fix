@@ -37,7 +37,7 @@ COPY src/ ./src/
 # Create entrypoint script directly in Dockerfile with permission fixing
 RUN echo '#!/bin/bash\n\
 set -e\n\
-echo "FastFoto Date Scanner - Container Starting"\n\
+echo "PhotoDate Fix - Container Starting"\n\
 echo "=========================================="\n\
 \n\
 # Fix permissions on mounted volumes\n\

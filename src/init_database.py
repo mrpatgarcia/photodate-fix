@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database initialization script for FastFoto Date Scanner
+Database initialization script for PhotoDate Fix
 Ensures the database and all required tables are created before the app starts
 """
 import sys
