@@ -764,6 +764,83 @@ def update_date():
         'results': results
     })
 
+@app.route('/search', methods=['GET'])
+def search_photos():
+    """Search for photos by filename across all unprocessed photos"""
+    try:
+        query = request.args.get('q', '').strip()
+        if not query:
+            return jsonify({
+                'success': True,
+                'results': [],
+                'message': 'No search query provided'
+            })
+        
+        # Get all unprocessed photos from database
+        photo_manager = PhotoManager()
+        photo_pairs = photo_manager.get_unprocessed_photo_pairs()
+        photo_groups = photo_manager.get_cached_photo_groups()
+        
+        # Search through individual photos and similarity groups
+        search_results = []
+        
+        # Search individual photos
+        for base_name, pair in photo_pairs.items():
+            # Search in base name and individual filenames
+            if query.lower() in base_name.lower():
+                search_results.append({
+                    'type': 'individual',
+                    'base_name': base_name,
+                    'front': pair.get('front'),
+                    'back': pair.get('back'),
+                    'variants': pair.get('variants', []),
+                    'match_type': 'base_name'
+                })
+                continue
+            
+            # Search in individual file paths
+            files_to_search = []
+            if pair.get('front'):
+                files_to_search.append(('front', pair['front']))
+            if pair.get('back'):
+                files_to_search.append(('back', pair['back']))
+            for variant in pair.get('variants', []):
+                files_to_search.append(('variant', variant))
+            
+            for file_type, filepath in files_to_search:
+                filename = os.path.basename(filepath)
+                if query.lower() in filename.lower():
+                    search_results.append({
+                        'type': 'individual',
+                        'base_name': base_name,
+                        'front': pair.get('front'),
+                        'back': pair.get('back'),
+                        'variants': pair.get('variants', []),
+                        'match_type': f'filename_{file_type}',
+                        'matched_file': filename
+                    })
+                    break  # Only add once per photo pair
+        
+        # Groups are excluded from search results as requested
+        
+        return jsonify({
+            'success': True,
+            'results': search_results,
+            'query': query,
+            'total_results': len(search_results)
+        })
+        
+    except Exception as e:
+        import traceback
+        print(f"ERROR: Search failed: {str(e)}")
+        print(f"ERROR: Full traceback:")
+        print(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'message': f'Search failed: {str(e)}',
+            'results': []
+        })
+
 @app.route('/scheduler_status', methods=['GET'])
 def scheduler_status():
     """Get scheduler status information"""

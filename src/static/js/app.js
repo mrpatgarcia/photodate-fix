@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize modal functionality
     initializeModal();
+    
+    // Initialize search functionality
+    initializeSearch();
 });
 
 async function handleDateSubmit(event) {
@@ -427,4 +430,252 @@ function initializeModal() {
         // Reset loading content in case of error state
         modalLoading.innerHTML = '<div class="loading-spinner"></div><p>Loading full resolution image...</p>';
     }
+}
+
+// Search functionality
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    let searchTimeout;
+    
+    if (!searchInput || !searchResults) {
+        console.warn('Search elements not found');
+        return;
+    }
+    
+    // Add input event listener with debouncing
+    searchInput.addEventListener('input', function(event) {
+        const query = event.target.value.trim();
+        
+        // Clear previous timeout
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+        
+        // Clear results if query is empty
+        if (!query) {
+            clearSearchResults();
+            return;
+        }
+        
+        // Debounce search - wait 300ms after user stops typing
+        searchTimeout = setTimeout(() => {
+            performSearch(query);
+        }, 300);
+    });
+    
+    // Clear search when Escape is pressed
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            searchInput.value = '';
+            clearSearchResults();
+        }
+    });
+}
+
+async function performSearch(query) {
+    const searchResults = document.getElementById('searchResults');
+    
+    try {
+        // Show loading state
+        searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+        searchResults.style.display = 'block';
+        
+        const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            displaySearchResults(result);
+        } else {
+            searchResults.innerHTML = `<div class="search-error">Search failed: ${result.message}</div>`;
+        }
+        
+    } catch (error) {
+        console.error('Search error:', error);
+        searchResults.innerHTML = '<div class="search-error">Search failed. Please try again.</div>';
+    }
+}
+
+function displaySearchResults(result) {
+    const searchResults = document.getElementById('searchResults');
+    
+    if (result.total_results === 0) {
+        searchResults.innerHTML = `
+            <div class="search-no-results">
+                No photos found matching "${result.query}"
+            </div>
+        `;
+        return;
+    }
+    
+    let html = `
+        <div class="search-header">
+            Found ${result.total_results} result${result.total_results !== 1 ? 's' : ''} for "${result.query}" - Click to edit dates
+        </div>
+        <div class="search-results-photos">
+    `;
+    
+    result.results.forEach(item => {
+        if (item.type === 'individual') {
+            html += renderSearchResultPhotoPair(item);
+        }
+    });
+    
+    html += '</div>';
+    searchResults.innerHTML = html;
+    
+    // Re-initialize event handlers for search results
+    initializeSearchResultHandlers();
+}
+
+function renderSearchResultPhotoPair(item) {
+    const matchInfo = item.matched_file ? ` (matched: ${item.matched_file})` : '';
+    
+    return `
+        <div class="photo-pair search-result-pair" data-base-name="${item.base_name}">
+            <div class="photo-info">
+                <h3>${item.base_name}${matchInfo}</h3>
+            </div>
+            
+            <div class="photo-display">
+                ${item.front ? `
+                    <div class="photo-side">
+                        <label>Front</label>
+                        <img src="/thumbnails/${getFileName(item.front)}" 
+                             alt="Front of ${item.base_name}" 
+                             class="photo-image clickable-photo"
+                             data-full-src="/photos/${getFileName(item.front)}"
+                             loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="image-placeholder" style="display: none;">
+                            <span>Image not found</span>
+                        </div>
+                        <div class="filename">${getFileName(item.front)}</div>
+                    </div>
+                ` : ''}
+                
+                <div class="photo-side">
+                    <label>Back</label>
+                    ${item.back ? `
+                        <img src="/thumbnails/${getFileName(item.back)}" 
+                             alt="Back of ${item.base_name}"
+                             class="photo-image clickable-photo"
+                             data-full-src="/photos/${getFileName(item.back)}"
+                             loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="image-placeholder" style="display: none;">
+                            <span>Image not found</span>
+                        </div>
+                        <div class="filename">${getFileName(item.back)}</div>
+                    ` : `
+                        <div class="image-placeholder">
+                            <span>None available</span>
+                        </div>
+                    `}
+                </div>
+                
+                ${item.variants.map(variant => `
+                    <div class="photo-side">
+                        <label>Original</label>
+                        <img src="/thumbnails/${getFileName(variant)}" 
+                             alt="Variant of ${item.base_name}"
+                             class="photo-image clickable-photo"
+                             data-full-src="/photos/${getFileName(variant)}"
+                             loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="image-placeholder" style="display: none;">
+                            <span>Image not found</span>
+                        </div>
+                        <div class="filename">${getFileName(variant)}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="date-input-section">
+                <form class="date-form">
+                    <label for="search-date-${item.base_name}">Correct Date:</label>
+                    <input type="date" 
+                           id="search-date-${item.base_name}" 
+                           name="date" 
+                           value=""
+                           required>
+                    <button type="submit">Update Date</button>
+                    <button type="button" class="ignore-btn">Unknown</button>
+                </form>
+                <div class="status-message"></div>
+            </div>
+        </div>
+    `;
+}
+
+function initializeSearchResultHandlers() {
+    // Add form submission handlers for search result photos
+    const searchForms = document.querySelectorAll('.search-result-pair .date-form');
+    searchForms.forEach(form => {
+        form.addEventListener('submit', handleDateSubmit);
+    });
+    
+    // Add ignore button handlers for search result photos  
+    const searchIgnoreButtons = document.querySelectorAll('.search-result-pair .ignore-btn');
+    searchIgnoreButtons.forEach(button => {
+        button.addEventListener('click', handleIgnoreClick);
+    });
+    
+    // Add modal handlers for search result photos
+    const searchClickablePhotos = document.querySelectorAll('.search-result-pair .clickable-photo');
+    searchClickablePhotos.forEach(photo => {
+        photo.addEventListener('click', function() {
+            const fullSrc = this.getAttribute('data-full-src');
+            if (fullSrc) {
+                const modal = document.getElementById('photoModal');
+                const modalImage = document.getElementById('modalImage');
+                const modalLoading = document.getElementById('modalLoading');
+                
+                // Show modal with loading state
+                modal.classList.add('show');
+                modalLoading.style.display = 'flex';
+                modalImage.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+                
+                // Create new image to preload
+                const img = new Image();
+                img.onload = function() {
+                    modalImage.src = fullSrc;
+                    modalLoading.style.display = 'none';
+                    modalImage.style.display = 'block';
+                };
+                img.onerror = function() {
+                    modalLoading.innerHTML = '<div class="loading-spinner"></div><p>Failed to load full image</p>';
+                    setTimeout(() => {
+                        modal.classList.remove('show');
+                        document.body.style.overflow = '';
+                        modalLoading.innerHTML = '<div class="loading-spinner"></div><p>Loading full resolution image...</p>';
+                    }, 2000);
+                };
+                img.src = fullSrc;
+            }
+        });
+    });
+    
+    // Add today's date as default for search result date inputs
+    const searchDateInputs = document.querySelectorAll('.search-result-pair input[type="date"]');
+    searchDateInputs.forEach(input => {
+        input.addEventListener('click', function() {
+            if (!this.value) {
+                const today = new Date().toISOString().split('T')[0];
+                this.value = today;
+            }
+        });
+    });
+}
+
+function clearSearchResults() {
+    const searchResults = document.getElementById('searchResults');
+    searchResults.style.display = 'none';
+    searchResults.innerHTML = '';
+}
+
+function getFileName(filepath) {
+    if (!filepath) return '';
+    return filepath.split('/').pop().split('\\').pop();
 }

@@ -17,6 +17,12 @@
             {% endif %}
         </header>
 
+        <!-- Search Box -->
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search filenames (e.g., '144' to find 'FastFoto_0144.jpg')" />
+            <div id="searchResults" class="search-results"></div>
+        </div>
+
         <main>
             <!-- Individual Photos Section (shown first) -->
             {% if photo_pairs %}
@@ -73,7 +79,7 @@
                                             <img src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}" 
                                                  alt="Variant of {{ base_name }}"
                                                  class="photo-image clickable-photo"
-                                                 data-full-src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}"
+                                                 data-full-src="{{ url_for('serve_photo', filename=variant|photo_filename) }}"
                                                  loading="lazy"
                                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                             <div class="image-placeholder" style="display: none;">
@@ -163,7 +169,7 @@
                                                 <img src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}" 
                                                      alt="Variant of {{ base_name }}"
                                                      class="photo-image clickable-photo"
-                                                     data-full-src="{{ url_for('serve_thumbnail', filename=variant|photo_filename) }}"
+                                                     data-full-src="{{ url_for('serve_photo', filename=variant|photo_filename) }}"
                                                      loading="lazy"
                                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                                 <div class="image-placeholder" style="display: none;">
